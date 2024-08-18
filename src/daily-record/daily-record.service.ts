@@ -122,6 +122,11 @@ export class DailyRecordService {
     startDate: Date,
     endDate: Date,
   ): Promise<DailyRecord[]> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (endDate > today) {
+      endDate = today;
+    }
     return this.dailyRecordRepository.find({
       where: {
         user: { id: userId },
