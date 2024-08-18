@@ -1,49 +1,56 @@
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+
 import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  OneToOne,
-  JoinColumn,
-} from 'typeorm';
+  Purpose,
+  FertilityAwarenessMethod,
+  CycleRegularity,
+} from '../enums/user-profile.enums';
 
-import { User } from './user.entity';
-
-@Entity()
+@Entity('user_profiles')
 export class UserProfile {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ nullable: false })
+  @Column({ type: 'varchar', length: 255, nullable: false })
   name: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'float', nullable: true })
   age: number;
 
-  @Column({ nullable: true })
-  purpose: string;
+  @Column({ type: 'enum', enum: Purpose, nullable: true, enumName: 'purpose' })
+  purpose: Purpose;
 
-  @Column({ nullable: true })
-  cycleRegularity: string;
+  @Column({
+    type: 'enum',
+    enum: FertilityAwarenessMethod,
+    nullable: true,
+    enumName: 'fertility_awareness_method',
+  })
+  fertilityAwarenessMethod: FertilityAwarenessMethod;
 
-  @Column({ nullable: true })
+  @Column({
+    type: 'enum',
+    enum: CycleRegularity,
+    nullable: true,
+    enumName: 'cycle_regularity',
+  })
+  cycleRegularity: CycleRegularity;
+
+  @Column({ type: 'float', nullable: true })
   cycleDuration: number;
 
-  @Column({ nullable: true })
+  @Column({ type: 'float', nullable: true })
   menstruationDuration: number;
 
-  @Column({ nullable: true })
+  @Column({ type: 'date', nullable: true })
   lastMenstruationDate: Date;
 
-  @Column({ nullable: true })
+  @Column({ type: 'text', nullable: true })
   illnesses: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'float', nullable: true })
   weight: number;
 
-  @Column({ nullable: true })
+  @Column({ type: 'float', nullable: true })
   height: number;
-
-  @OneToOne(() => User, (user) => user.profile, { cascade: true })
-  @JoinColumn()
-  user: User;
 }
