@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { RegisterUserDto, LoginResponseDto } from 'src/dto/user.dto';
 
 @Injectable()
 export class AuthService {
@@ -18,7 +19,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async register(email: string, password: string): Promise<User> {
+  async register(email: string, password: string): Promise<RegisterUserDto> {
     const existingUser = await this.userRepository.findOne({
       where: { email },
     });
@@ -31,13 +32,20 @@ export class AuthService {
       email,
       password: hashedPassword,
     });
-    return this.userRepository.save(user);
+
+    const savedUser = await this.userRepository.save(user);
+
+    const response: RegisterUserDto = {
+      id: savedUser.id,
+      email: savedUser.email,
+      isAdmin: savedUser.isAdmin,
+      message: 'User registered successfully.',
+    };
+
+    return response;
   }
 
-  async login(
-    email: string,
-    password: string,
-  ): Promise<{ access_token: string }> {
+  async login(email: string, password: string): Promise<LoginResponseDto> {
     const user = await this.userRepository.findOne({ where: { email } });
     if (!user) {
       throw new UnauthorizedException('Credenciales incorrectas.');
@@ -49,9 +57,15 @@ export class AuthService {
     }
 
     const payload = { email: user.email, sub: user.id };
-    return {
-      access_token: this.jwtService.sign(payload),
+    const accesToken = this.jwtService.sign(payload);
+
+    const response: LoginResponseDto = {
+      access_token: accesToken,
+      expires_in: 3600,
+      message: 'Login successful.',
     };
+
+    return response;
   }
 
   async validateUser(userId: number): Promise<User> {

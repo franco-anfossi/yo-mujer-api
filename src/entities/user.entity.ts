@@ -4,16 +4,18 @@ import {
   PrimaryGeneratedColumn,
   OneToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 
 import { UserProfile } from './user-profile.entity';
+import { DailyRecord } from './daily-record.entity';
 
-@Entity()
+@Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ unique: true })
   email: string;
 
   @Column()
@@ -22,7 +24,10 @@ export class User {
   @Column({ default: false })
   isAdmin: boolean;
 
-  @OneToOne(() => UserProfile)
+  @OneToOne(() => UserProfile, { cascade: true })
   @JoinColumn()
   profile: UserProfile;
+
+  @OneToMany(() => DailyRecord, (dailyRecord) => dailyRecord.user)
+  dailyRecords: DailyRecord[];
 }
